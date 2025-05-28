@@ -1,44 +1,80 @@
-// #include "buttons.h"
+/* NOTE: Interrupt logic may need restructuring later on to
+be tailored towards game logic */
 
-// /* 
-// Assignments: 
-// ==================
-// PB0 - Left Button
-// PB1 - Right Button 
-// */
+#include "buttons.h"
 
-// /* Initialize button input pins */
-// void buttons_init(){
+volatile uint32_t lb_pressed;
+volatile uint32_t rb_pressed;
 
-// /* Reset and Set GPIOBEN */
-// RCC_AHB1ENR &= ~(0x1 << 1);
-// RCC_AHB1ENR |= (0x1 << 1);
+/* Initialize external interrupt */
+void init_exti(void){
+    /* Connect EXTI lines to PB0 and PB1 */
+    SYSCFG_EXTICR1 &= ~(0xF | (0xF << 4));
+    SYSCFG_EXTICR1 |= (0x1 | (0x1 << 4));
 
-// /* Configure input mode for PB0 and PB1 */
-// GPIOB_MODER &= ~((0x3) | (0x3 << (1 * 2)));
+    /* Unmask lines 0 and 1 */
+    EXTI_IMR &= ~(0x3);
+    EXTI_IMR |= 0x3;
 
-// /* Set pull-down for both pins */
-// GPIOB_PUPDR &= ~((0x3) | (0x3 << (1 * 2)));
-// GPIOB_PUPDR |= ((0x2) | (0x2 << (1 * 2)));
-// }
+    /* Set both lines 0 and 1 to rising edge trigger */
+    EXTI_RTSR &= ~(0x3);
+    EXTI_RTSR |= 0x3;
 
-// /* Read the value of the left button (PB0), 1 if true and 0 if false */
-// uint32_t read_left_button(){
-//     /* If left button is reading 1, return 1 */
-//     if((GPIOB_IDR & 0x1) == 0x1){
-//         return 1;
-//     }
-//     else{
-//         return 0;
-//     }
-// }
+    /* Enable interrupt requessts for NVIC */
+    __NVIC_EnableIRQ(EXTI0_IRQn);
+    __NVIC_EnableIRQ(EXTI1_IRQn);
+};
 
-// /* Read the value of the right button (PB1), 1 if true and 0 if false */
-// uint32_t read_right_button(){
-//     if((GPIOB_IDR & (0x1 << 1)) == (0x1 << 1)){
-//         return 1;
-//     }
-//     else{
-//         return 0;
-//     }
-// }
+/* Initialize buttons, including init_exti() */
+void init_buttons(void){
+    /* Initialize external interrupt */
+    init_exti();
+
+    /* Set PB0 and PB1 to input (reset state) */
+    GPIOB_MODER &= ~(0x3 | (0x3 << 2));
+
+    /* Set both PB0 and PB1 to pull down */
+    GPIOB_PUPDR &= ~(0x3 | (0x3 << 2));
+    GPIOB_PUPDR |= (0x2 | (0x2 << 2));
+
+    /* Buttons by default are not pressed */
+    lb_pressed = 0;
+    rb_pressed = 0;
+};
+
+/* Clear specific bit of the EXTI_PR */
+void clear_EXTI_bit(uint32_t bit_pos){
+    EXTI_PR |= (0x1 << bit_pos);
+};
+
+/* Handle PB0/Left Button being pressed */
+void EXTI0_IRQHandler(void){
+    lb_press_reg();
+    clear_EXTI_bit(0);
+};
+
+/* Handle PB1/Right Button being pressed */
+void EXTI1_IRQHandler(void){
+    rb_press_reg();
+    clear_EXTI_bit(1);
+};
+
+/* ### Functions that will go inside the handlers ### */
+
+void lb_press_reg(void){
+    lb_pressed = 1;
+};
+
+void lb_press_clear(void){
+    lb_pressed = 0;
+};
+
+/* For clearing the pressed flag once a new math problem is generated */
+
+void rb_press_reg(void){
+    rb_pressed = 1;
+};
+
+void rb_press_clear(void){
+    rb_pressed = 0;
+};

@@ -24,7 +24,7 @@ void SysTickHandler(void){
     ms_ticks++;
 }
 
-/* System sleep in ms */
+/* Sleep system in milliseconds */
 void sleep(uint32_t time){
     uint32_t ms_curr = ms_ticks;
     while(ms_ticks - ms_curr < time){

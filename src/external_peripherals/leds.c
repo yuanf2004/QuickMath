@@ -8,15 +8,6 @@ PC1 - Yellow LED
 PC2 - Green LED
 */
 
-/*
-
-
-define GPIOC_MODER *((uint32_t *)(0x40020800))
-
-define GPIOC_ODR *((uint32_t *)(0x40020800 + 0x14))
-
-*/
-
 /* Initialize LEDs */
 void init_leds(void){
 
