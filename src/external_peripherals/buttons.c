@@ -3,6 +3,13 @@ be tailored towards game logic */
 
 #include "buttons.h"
 
+/*
+Pin Assignments:
+====================================
+PB0 - Left Button [Pull-down EXTI0]
+PB1 - Right Button [Pull-down EXTI1]
+*/
+
 volatile uint32_t lb_pressed;
 volatile uint32_t rb_pressed;
 

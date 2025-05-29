@@ -23,6 +23,13 @@
 /* Pending register to be cleared inside of interrupt handler function */
 #define EXTI_PR *(uint32_t *)(( 0x40013C00 + 0x14))
 
+/*
+Pin Assignments:
+====================================
+PB0 - Left Button [Pull-down EXTI0]
+PB1 - Right Button [Pull-down EXTI1]
+*/
+
 extern volatile uint32_t lb_pressed;
 extern volatile uint32_t rb_pressed;
 
